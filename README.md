@@ -13,6 +13,39 @@ El framework está preparado para construir desde simples programas de texto has
 - **Sonidos y Música:** Uso nativo de la instrucción `SOUND` para efectos de sonido (disparos, explosiones) y de la función `PLAY` para componer melodías retro (ej. canciones de victoria o "game over").
 - **Lógica de Videojuegos:** Rutinas de física básica, sistemas de probabilidad (`RND`) para el comportamiento de entidades (como invasores que deciden disparar), temporizadores (Frames) y manejo fluido de múltiples objetos en pantalla usando matrices (`DIM SHARED`).
 
+## 🎨 ¿Cómo crear Sprites sin archivos externos?
+
+Este framework utiliza un sistema de **"Sprites por Código"** que permite crear gráficos sin depender de archivos de imagen externos (`.bmp`, `.png`), manteniendo todo el código en un único archivo ejecutable. El proceso se basa en dibujar figuras geométricas en la memoria gráfica oculta y capturarlas en arrays.
+
+### Pasos para crear un Sprite:
+1. **Definir un Array (Vector):** Se reserva espacio en memoria utilizando `DIM SHARED` para almacenar los datos de los píxeles. El tamaño del array depende de las dimensiones en píxeles de la imagen.
+2. **Dibujar la forma:** Se limpia la pantalla temporalmente (`CLS`) y se utilizan comandos gráficos puros de QBasic como `LINE` (con los parámetros `B` para cajas huecas o `BF` para rellenar). Los colores se basan en la paleta del modo de pantalla elegido (ej. `SCREEN 7` tiene 16 colores).
+3. **Capturar la imagen:** Se usa la instrucción `GET` para leer el bloque rectangular de píxeles en pantalla y guardarlo dentro del array previamente creado.
+4. **Limpiar y Continuar:** La pantalla se vuelve a limpiar. Todo esto ocurre de forma casi instantánea al iniciar el programa, y es imperceptible para el jugador.
+
+### Ejemplo de Código:
+```basic
+' 1. Crear el array para guardar la imagen
+DIM SHARED imgPlayer(100) AS INTEGER
+
+' 2. Entorno de dibujo (se hace en la inicialización)
+CLS
+
+' Dibujar partes de la nave (verde brillante = color 10)
+LINE (7, 0)-(8, 4), 10, BF   ' Cañón principal
+LINE (5, 5)-(10, 9), 10, BF  ' Cuerpo superior
+LINE (1, 10)-(14, 15), 10, BF ' Base
+
+' 3. Capturar la imagen completa (rectángulo de 16x16 píxeles)
+GET (0, 0)-(15, 15), imgPlayer
+CLS
+```
+
+Para dibujar el sprite en la pantalla durante el ciclo principal del juego, simplemente usa la instrucción `PUT`:
+```basic
+PUT (playerX, playerY), imgPlayer, PSET
+```
+
 ## 📁 Estructura del Proyecto
 
 * **`agents/`**: Contiene la definición de rol y el prompt del Agente (`qbasic_agent.md`) que actúa como el Ingeniero de Software Senior en QBasic.
