@@ -40,7 +40,17 @@ CLS
 
 ### Método 2: Modelador Basado en Texto (Avanzado - `src/engine`)
 Utilizado en el motor físico (`framework.bas`). Permite crear pixel art de forma mucho más visual usando bloques de texto en el propio código, donde cada carácter representa un color Hexadecimal (0-F).
-1. **Crear el mapa visual con DATA:** Se "dibuja" la imagen usando strings debajo de una etiqueta, donde `0` es negro/transparente, `1` es azul, `4` es rojo, `F` es blanco, etc.
+1. **Crear el mapa visual con DATA:** Se "dibuja" la imagen usando strings debajo de una etiqueta. Cada carácter representa un color Hexadecimal de la paleta estándar de 16 colores:
+   | Hex | Color | Hex | Color |
+   |---|---|---|---|
+   | `0` | Transparente / Negro | `8` | Gris Oscuro |
+   | `1` | Azul Oscuro | `9` | Azul Claro |
+   | `2` | Verde Oscuro | `A` | Verde Claro |
+   | `3` | Cian Oscuro | `B` | Cian Claro |
+   | `4` | Rojo Oscuro | `C` | Rojo Claro |
+   | `5` | Magenta Oscuro | `D` | Magenta Claro |
+   | `6` | Marrón / Naranja | `E` | Amarillo |
+   | `7` | Gris Claro | `F` | Blanco |
 2. **Cargar mediante un renderizador:** La rutina `DrawSpriteFromData` lee estos datos con `READ`, los convierte a colores y dibuja los píxeles (con la opción de escalarlos) automáticamente antes de guardarlos con `GET`.
 
 ```basic
