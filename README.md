@@ -15,33 +15,51 @@ El framework está preparado para construir desde simples programas de texto has
 
 ## 🎨 ¿Cómo crear Sprites sin archivos externos?
 
-Este framework utiliza un sistema de **"Sprites por Código"** que permite crear gráficos sin depender de archivos de imagen externos (`.bmp`, `.png`), manteniendo todo el código en un único archivo ejecutable. El proceso se basa en dibujar figuras geométricas en la memoria gráfica oculta y capturarlas en arrays.
+Este framework utiliza un sistema de **"Sprites por Código"** que permite crear gráficos sin depender de archivos de imagen externos (`.bmp`, `.png`), manteniendo todo el código en un único archivo ejecutable. Existen dos métodos principales implementados:
 
-### Pasos para crear un Sprite:
-1. **Definir un Array (Vector):** Se reserva espacio en memoria utilizando `DIM SHARED` para almacenar los datos de los píxeles. El tamaño del array depende de las dimensiones en píxeles de la imagen.
-2. **Dibujar la forma:** Se limpia la pantalla temporalmente (`CLS`) y se utilizan comandos gráficos puros de QBasic como `LINE` (con los parámetros `B` para cajas huecas o `BF` para rellenar). Los colores se basan en la paleta del modo de pantalla elegido (ej. `SCREEN 7` tiene 16 colores).
-3. **Capturar la imagen:** Se usa la instrucción `GET` para leer el bloque rectangular de píxeles en pantalla y guardarlo dentro del array previamente creado.
-4. **Limpiar y Continuar:** La pantalla se vuelve a limpiar. Todo esto ocurre de forma casi instantánea al iniciar el programa, y es imperceptible para el jugador.
+### Método 1: Dibujo por Formas Geométricas (Básico)
+Utilizado en juegos como *Space Invaders*. Consiste en dibujar figuras geométricas usando instrucciones puras de QBasic.
+1. **Definir un Array (Vector):** Se reserva espacio en memoria utilizando `DIM SHARED` para almacenar los datos de los píxeles.
+2. **Dibujar la forma:** Se limpia la pantalla (`CLS`) y se usan comandos como `LINE` para pintar rectángulos. Los colores se basan en la paleta del modo de pantalla (ej. 16 colores).
+3. **Capturar la imagen:** Se usa la instrucción `GET` para leer el bloque rectangular de píxeles y guardarlo en el array.
 
-### Ejemplo de Código:
 ```basic
-' 1. Crear el array para guardar la imagen
+' 1. Crear el array y limpiar entorno
 DIM SHARED imgPlayer(100) AS INTEGER
-
-' 2. Entorno de dibujo (se hace en la inicialización)
 CLS
 
-' Dibujar partes de la nave (verde brillante = color 10)
+' 2. Dibujar partes de la nave (verde brillante = color 10)
 LINE (7, 0)-(8, 4), 10, BF   ' Cañón principal
 LINE (5, 5)-(10, 9), 10, BF  ' Cuerpo superior
 LINE (1, 10)-(14, 15), 10, BF ' Base
 
-' 3. Capturar la imagen completa (rectángulo de 16x16 píxeles)
+' 3. Capturar la imagen completa (rectángulo de 16x16 píxeles) y limpiar
 GET (0, 0)-(15, 15), imgPlayer
 CLS
 ```
 
-Para dibujar el sprite en la pantalla durante el ciclo principal del juego, simplemente usa la instrucción `PUT`:
+### Método 2: Modelador Basado en Texto (Avanzado - `src/engine`)
+Utilizado en el motor físico (`framework.bas`). Permite crear pixel art de forma mucho más visual usando bloques de texto en el propio código, donde cada carácter representa un color Hexadecimal (0-F).
+1. **Crear el mapa visual con DATA:** Se "dibuja" la imagen usando strings debajo de una etiqueta, donde `0` es negro/transparente, `1` es azul, `4` es rojo, `F` es blanco, etc.
+2. **Cargar mediante un renderizador:** La rutina `DrawSpriteFromData` lee estos datos con `READ`, los convierte a colores y dibuja los píxeles (con la opción de escalarlos) automáticamente antes de guardarlos con `GET`.
+
+```basic
+' 1. Diseñar el Sprite Visualmente en el Código
+SpritePersona:
+DATA "10011001"
+DATA "10011001"
+DATA "11111111"
+DATA "00444400"
+DATA "04000400"
+DATA "F000000F"
+
+' 2. Cargar el Sprite en el Array (indicando ancho y alto)
+DIM SHARED imgPlayer(100) AS INTEGER
+RESTORE SpritePersona
+DrawSpriteFromData imgPlayer(), 8, 6
+```
+
+Para dibujar el sprite en la pantalla durante el ciclo principal del juego (independientemente del método usado), usa la instrucción `PUT`:
 ```basic
 PUT (playerX, playerY), imgPlayer, PSET
 ```
